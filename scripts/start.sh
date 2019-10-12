@@ -1,5 +1,12 @@
 #!/bin/bash
 set -x
+
+SFTP_MODE='true'
+SFTP_CHROOT='/data'
+SSH_USERS='nopost:1086:1086'
+MOTD='flag'
+mkdir -p /data
+
 #proxy
 if [[ "X${HTTP_PROXY}" != "X" ]]; then
 export http_proxy=$HTTP_PROXY
