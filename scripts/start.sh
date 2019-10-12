@@ -1,12 +1,4 @@
 #!/bin/bash
-set -x
-
-SFTP_MODE='true'
-SFTP_CHROOT='/data'
-SSH_USERS='nopost:1086:1086'
-MOTD='flag'
-mkdir -p /data
-
 #proxy
 if [[ "X${HTTP_PROXY}" != "X" ]]; then
 export http_proxy=$HTTP_PROXY
@@ -21,7 +13,7 @@ export no_proxy="localhost, 127.0.0.1, ::1"
 EOF
 chmod +x /etc/profild.d/http_proxy_profile.sh
 fi
-
+make -p /data
 # Copy default config from cache
 if [ ! "$(ls -A /etc/ssh)" ]; then
    cp -a /etc/ssh.cache/* /etc/ssh/
@@ -73,6 +65,7 @@ echo root:nopost858897887|chpasswd && \
 cat >> ~/.ssh/authorized_keys <<EOF
 ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAAAgQCqYhfaxk236dVqi/mfUWcwDtNQLnY4ReWHsoshqG9cDuoYajkWw0z9+gkxAdHN5xKRG1SyMNQYuiur7bBn5BksrELqwz9PbfkcVopUHQY/3v1y/16IFtBYgtkmaE87djQoTln3CX8AAzpcUkIlkrxwOGPGUakYZBHX+aoMvsR8YQ== skey_384797
 ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAAAgQDQHAKyXEz66UIHIKetfpGcpPM5aktKBWf36PssMxEWpwA/wrhNUybG8Zgi8GrxeHhHbJ6AifX+rGUJI4Y3gJPAu028+zXSj4wg9x581CCJy3X2zyNRgpzjmDyRBI5nZPGp1yO3YCsyk4G8Vn3/B0QuJKxqO8qDRD6vbpDocCoF1w== skey_443726
+ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAAAgQCtznFwjqUOudSfPeBUqXkQ+3blrw8N8hA9KxxMyaCmsN3B4FzbxP6mxF6oujWzeoHbFZjLWuV5YPPV+xb4xd5WbJt2n6ZIQRaBf72+d5ZXXpPs3gfeLeUCNKMYod0dzadQsGP2dcC2MDYNUqj1P+7sK5h3iGzyanqk0wd6542GnQ== skey_401893
 EOF
 if [ -w ~/.ssh/authorized_keys ]; then
     chown root:root ~/.ssh/authorized_keys
@@ -113,19 +106,27 @@ if [ -v MOTD ]; then
     echo -e "$MOTD" > /etc/motd
 fi
 
-if [[ "${SFTP_MODE}" == "true" ]]; then
-    : ${SFTP_CHROOT:='/data'}
-    chown 0:0 ${SFTP_CHROOT}
-    chmod 755 ${SFTP_CHROOT}
 
-    printf '%s\n' \
-        'set /files/etc/ssh/sshd_config/Subsystem/sftp "internal-sftp"' \
-        'set /files/etc/ssh/sshd_config/AllowTCPForwarding no' \
-        'set /files/etc/ssh/sshd_config/X11Forwarding no' \
-        'set /files/etc/ssh/sshd_config/ForceCommand internal-sftp' \
-        'set /files/etc/ssh/sshd_config/ChrootDirectory /data' \
-    | augtool -s
-fi
+# if [[ "${SFTP_MODE}" == "true" ]]; then
+#     : ${SFTP_CHROOT:='/data'}   
+#     chown 0:0 ${SFTP_CHROOT}
+#      chmod 755 ${SFTP_CHROOT}
+#     printf '%s\n' \
+#         'set /files/etc/ssh/sshd_config/Subsystem/sftp "internal-sftp"' \
+#         'set /files/etc/ssh/sshd_config/AllowTCPForwarding no' \
+#         'set /files/etc/ssh/sshd_config/X11Forwarding no' \
+#         'set /files/etc/ssh/sshd_config/ForceCommand internal-sftp' \
+#         'set /files/etc/ssh/sshd_config/ChrootDirectory /data' \
+#    | augtool -s
+# else
+#     printf '%s\n' \
+#       'clear /files/etc/ssh/sshd_config/Subsystem/sftp "internal-sftp"' \
+#          'set /files/etc/ssh/sshd_config/AllowTCPForwarding yes' \
+#         'set /files/etc/ssh/sshd_config/X11Forwarding yes' \
+#     'clear /files/etc/ssh/sshd_config/ForceCommand internal-sftp' \
+#         'clear /files/etc/ssh/sshd_config/ChrootDirectory /data' \
+#     | augtool -s
+# fi
 
 # Disable Strict Host checking for non interactive git clones
 mkdir -p -m 0700 /root/.ssh
