@@ -1,21 +1,19 @@
 #!/bin/bash
 set -x
 #proxy
-if [ ! -z "$HTTP_PROXY" ]; then
-  export http_proxy=$HTTP_PROXY
-  export https_proxy=$HTTP_PROXY
-  export ftp_proxy=$HTTP_PROXY
-  export no_proxy="localhost, 127.0.0.1, ::1"
+if [[ "X${HTTP_PROXY}" != "X" ]]; then
+export http_proxy=$HTTP_PROXY
+export https_proxy=$HTTP_PROXY
+export ftp_proxy=$HTTP_PROXY
+export no_proxy="localhost, 127.0.0.1, ::1"
 cat > /etc/profile.d/http_proxy_profile.sh <<EOF
-    export proxy="$HTTP_PROXY"
-    export http_proxy=$proxy
-    export https_proxy=$proxy
-    export ftp_proxy=$proxy
-    export no_proxy="localhost, 127.0.0.1, ::1"
+export http_proxy=$HTTP_PROXY
+export https_proxy=$HTTP_PROXY
+export ftp_proxy=$HTTP_PROXY
+export no_proxy="localhost, 127.0.0.1, ::1"
 EOF
-chmod +x /etc/profile.d/http_proxy_profile.sh || true
+chmod +x /etc/profild.d/http_proxy_profile.sh
 fi
-
 
 # Copy default config from cache
 if [ ! "$(ls -A /etc/ssh)" ]; then
